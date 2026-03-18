@@ -21,7 +21,7 @@ Build backend first, then API, then frontend. Never build UI before the underlyi
   ```bash
   npx create-next-app@latest rewind-ai --typescript --tailwind --app
   ```
-- [ ] Create GitHub repo (public) and push initial commit
+- [x] Create GitHub repo (public) and push initial commit
 - [x] Install dependencies:
   ```bash
   npm install youtube-transcript groq-sdk @supabase/supabase-js \
@@ -38,7 +38,7 @@ Build backend first, then API, then frontend. Never build UI before the underlyi
   SUPABASE_URL=
   SUPABASE_ANON_KEY=
   ```
-- [ ] Sign up and get API keys: Groq (console.groq.com), HuggingFace (huggingface.co), Supabase (supabase.com)
+- [x] Sign up and get API keys: Groq (console.groq.com), HuggingFace (huggingface.co), Supabase (supabase.com)
 - [x] Install `zod` for request validation: `npm install zod`
 - [x] Never prefix env vars with `NEXT_PUBLIC_` — all API calls to Groq and HuggingFace must happen server-side only (API routes), never in React components
 
@@ -51,11 +51,11 @@ Build backend first, then API, then frontend. Never build UI before the underlyi
 
 Run the following in the Supabase SQL editor:
 
-- [ ] Enable pgvector:
+- [x] Enable pgvector:
   ```sql
   create extension if not exists vector;
   ```
-- [ ] Create `videos` table:
+- [x] Create `videos` table:
   ```sql
   create table videos (
     id uuid primary key default gen_random_uuid(),
@@ -67,7 +67,7 @@ Run the following in the Supabase SQL editor:
     created_at timestamp default now()
   );
   ```
-- [ ] Create `chunks` table:
+- [x] Create `chunks` table:
   ```sql
   create table chunks (
     id uuid primary key default gen_random_uuid(),
@@ -80,11 +80,11 @@ Run the following in the Supabase SQL editor:
     created_at timestamp default now()
   );
   ```
-- [ ] Add vector index for fast similarity search (use HNSW — unlike IVFFlat, it works on empty tables and doesn't need retraining as data grows):
+- [x] Add vector index for fast similarity search (use HNSW — unlike IVFFlat, it works on empty tables and doesn't need retraining as data grows):
   ```sql
   create index on chunks using hnsw (embedding vector_cosine_ops);
   ```
-- [ ] Create similarity search functions — one for single-video queries, one for cross-video (library-wide) queries:
+- [x] Create similarity search functions — one for single-video queries, one for cross-video (library-wide) queries:
   ```sql
   create or replace function match_chunks(
     query_embedding vector(768),
@@ -114,7 +114,7 @@ Run the following in the Supabase SQL editor:
     limit match_count;
   $$;
   ```
-- [ ] Enable Row Level Security (RLS) on both tables and add policies to allow the anon key to read and write (no auth, so allow all operations):
+- [x] Enable Row Level Security (RLS) on both tables and add policies to allow the anon key to read and write (no auth, so allow all operations):
   ```sql
   alter table videos enable row level security;
   alter table chunks enable row level security;
@@ -122,7 +122,7 @@ Run the following in the Supabase SQL editor:
   create policy "Allow all on videos" on videos for all using (true) with check (true);
   create policy "Allow all on chunks" on chunks for all using (true) with check (true);
   ```
-- [ ] Create `lib/supabase.ts` — initialise and export the Supabase client:
+- [x] Create `lib/supabase.ts` — initialise and export the Supabase client:
   ```ts
   import { createClient } from '@supabase/supabase-js'
   export const supabase = createClient(
