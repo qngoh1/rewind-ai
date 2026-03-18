@@ -202,19 +202,19 @@ Build and test each step individually before connecting them.
 *Goal: given a question and video ID, return a relevant streamed answer*
 
 **Step 1 — Semantic search**
-- [ ] Create `lib/search.ts`
-- [ ] Add a simple in-memory cache to avoid re-embedding the same query twice:
+- [x] Create `lib/search.ts`
+- [x] Add a simple in-memory cache to avoid re-embedding the same query twice:
   ```ts
   const cache = new Map<string, number[]>()
   // before embedding: if (cache.has(query)) return cache.get(query)
   // after embedding: cache.set(query, embedding)
   ```
-- [ ] Embed the user's question, call `match_chunks`, return top 5 chunks with timestamps
-- [ ] Test: query an ingested video, log the returned chunks
+- [x] Embed the user's question, call `match_chunks`, return top 5 chunks with timestamps
+- [x] Test: query an ingested video, log the returned chunks
 
 **Step 2 — Build prompt**
-- [ ] Create `lib/buildPrompt.ts`
-- [ ] Construct a system prompt that includes the retrieved chunks as context and instructs the LLM to answer only from that context and include timestamps:
+- [x] Create `lib/buildPrompt.ts`
+- [x] Construct a system prompt that includes the retrieved chunks as context and instructs the LLM to answer only from that context and include timestamps:
   ```ts
   const systemPrompt = `
     You are a helpful assistant. Answer the user's question using only the
@@ -226,8 +226,8 @@ Build and test each step individually before connecting them.
   ```
 
 **Step 3 — Generate answer**
-- [ ] Create `lib/generate.ts`
-- [ ] Call Groq (`llama-3.3-70b-versatile`) using Vercel AI SDK and stream the response:
+- [x] Create `lib/generate.ts`
+- [x] Call Groq (`llama-3.3-70b-versatile`) using Vercel AI SDK and stream the response:
   ```ts
   import { streamText } from 'ai'
   import { createGroq } from '@ai-sdk/groq'
@@ -242,7 +242,7 @@ Build and test each step individually before connecting them.
     })
   }
   ```
-- [ ] Test: ask a question about an ingested video, confirm a relevant streamed answer
+- [x] Test: ask a question about an ingested video, confirm a relevant streamed answer
 
 **Done when:** you can ask a question in the terminal and get a relevant streamed answer
 
