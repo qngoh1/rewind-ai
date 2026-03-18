@@ -17,12 +17,12 @@ Build backend first, then API, then frontend. Never build UI before the underlyi
 ## Phase 0 — Project setup
 *Goal: working repo, all tools installed, environment ready*
 
-- [ ] Create Next.js app:
+- [x] Create Next.js app:
   ```bash
   npx create-next-app@latest rewind-ai --typescript --tailwind --app
   ```
 - [ ] Create GitHub repo (public) and push initial commit
-- [ ] Install dependencies:
+- [x] Install dependencies:
   ```bash
   npm install youtube-transcript groq-sdk @supabase/supabase-js \
     @modelcontextprotocol/sdk ai @ai-sdk/groq tiktoken tsx
@@ -30,8 +30,8 @@ Build backend first, then API, then frontend. Never build UI before the underlyi
   - `tiktoken` — accurately counts tokens when chunking the transcript
   - `tsx` — runs TypeScript files directly (used for the MCP server)
   - `ai` — Vercel AI SDK for streaming LLM responses
-- [ ] Initialise shadcn/ui: `npx shadcn@latest init`
-- [ ] Create `.env` and `.env.example` with these keys (use `.env` not `.env.local` so both the Next.js app and MCP server can read from the same file):
+- [x] Initialise shadcn/ui: `npx shadcn@latest init`
+- [x] Create `.env` and `.env.example` with these keys (use `.env` not `.env.local` so both the Next.js app and MCP server can read from the same file):
   ```
   GROQ_API_KEY=
   HUGGINGFACE_API_KEY=
@@ -39,8 +39,8 @@ Build backend first, then API, then frontend. Never build UI before the underlyi
   SUPABASE_ANON_KEY=
   ```
 - [ ] Sign up and get API keys: Groq (console.groq.com), HuggingFace (huggingface.co), Supabase (supabase.com)
-- [ ] Install `zod` for request validation: `npm install zod`
-- [ ] Never prefix env vars with `NEXT_PUBLIC_` — all API calls to Groq and HuggingFace must happen server-side only (API routes), never in React components
+- [x] Install `zod` for request validation: `npm install zod`
+- [x] Never prefix env vars with `NEXT_PUBLIC_` — all API calls to Groq and HuggingFace must happen server-side only (API routes), never in React components
 
 **Done when:** `npm run dev` starts without errors
 
