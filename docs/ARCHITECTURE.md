@@ -28,7 +28,7 @@ Supabase and Groq are shared across all three flows. The web app and MCP server 
 |---|---|
 | Framework | Next.js 15, TypeScript, Tailwind CSS, shadcn/ui |
 | LLM | Groq — Llama 3.3 70B |
-| Embeddings | HuggingFace — nomic-embed-text |
+| Embeddings | HuggingFace — all-MiniLM-L6-v2 (384 dimensions) |
 | Transcription | youtube-transcript (Whisper fallback planned for v2) |
 | Vector DB | Supabase pgvector |
 | Streaming | Vercel AI SDK |
@@ -56,7 +56,7 @@ Supabase and Groq are shared across all three flows. The web app and MCP server 
 | id | uuid PK |
 | video_id | uuid FK |
 | content | text |
-| embedding | vector(768) |
+| embedding | vector(384) |
 | start_time | int (seconds) |
 | end_time | int (seconds) |
 | chunk_index | int |

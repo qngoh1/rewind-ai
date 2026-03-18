@@ -17,7 +17,7 @@ create table chunks (
   id uuid primary key default gen_random_uuid(),
   video_id uuid references videos(id) on delete cascade,
   content text,
-  embedding vector(768),
+  embedding vector(384),
   start_time int,
   end_time int,
   chunk_index int,
@@ -29,7 +29,7 @@ create index on chunks using hnsw (embedding vector_cosine_ops);
 
 -- Similarity search for a single video
 create or replace function match_chunks(
-  query_embedding vector(768),
+  query_embedding vector(384),
   match_video_id uuid,
   match_count int default 5
 )
@@ -45,7 +45,7 @@ $$;
 
 -- Similarity search across all videos
 create or replace function match_chunks_all(
-  query_embedding vector(768),
+  query_embedding vector(384),
   match_count int default 5
 )
 returns table(id uuid, video_id uuid, content text, start_time int, end_time int, similarity float)

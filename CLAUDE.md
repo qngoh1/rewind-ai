@@ -10,7 +10,7 @@ Rewind is a Next.js web app + MCP server that turns YouTube videos into a search
 
 - **Framework:** Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
 - **LLM:** Groq (Llama 3.3 70B)
-- **Embeddings:** HuggingFace (nomic-embed-text, 768 dimensions)
+- **Embeddings:** HuggingFace (all-MiniLM-L6-v2, 384 dimensions)
 - **Vector DB:** Supabase pgvector
 - **Streaming:** Vercel AI SDK
 - **MCP:** @modelcontextprotocol/sdk (stdio transport, local only)

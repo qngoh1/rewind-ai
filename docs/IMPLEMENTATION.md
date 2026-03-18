@@ -73,7 +73,7 @@ Run the following in the Supabase SQL editor:
     id uuid primary key default gen_random_uuid(),
     video_id uuid references videos(id) on delete cascade,
     content text,
-    embedding vector(768),
+    embedding vector(384),
     start_time int,
     end_time int,
     chunk_index int,
@@ -87,7 +87,7 @@ Run the following in the Supabase SQL editor:
 - [x] Create similarity search functions — one for single-video queries, one for cross-video (library-wide) queries:
   ```sql
   create or replace function match_chunks(
-    query_embedding vector(768),
+    query_embedding vector(384),
     match_video_id uuid,
     match_count int default 5
   )
@@ -102,7 +102,7 @@ Run the following in the Supabase SQL editor:
   $$;
 
   create or replace function match_chunks_all(
-    query_embedding vector(768),
+    query_embedding vector(384),
     match_count int default 5
   )
   returns table(id uuid, video_id uuid, content text, start_time int, end_time int, similarity float)
@@ -141,8 +141,8 @@ Run the following in the Supabase SQL editor:
 Build and test each step individually before connecting them.
 
 **Step 1 — Fetch transcript**
-- [ ] Create `lib/getTranscript.ts`
-- [ ] Validate that the URL is a legitimate YouTube URL and extract the video ID (handle both `youtube.com/watch?v=ID` and `youtu.be/ID` formats):
+- [x] Create `lib/getTranscript.ts`
+- [x] Validate that the URL is a legitimate YouTube URL and extract the video ID (handle both `youtube.com/watch?v=ID` and `youtu.be/ID` formats):
   ```ts
   const parsed = new URL(youtubeUrl)
   let videoId: string | null = null
@@ -153,11 +153,11 @@ Build and test each step individually before connecting them.
   }
   if (!videoId) throw new Error('Invalid YouTube URL')
   ```
-- [ ] Fetch transcript using `youtube-transcript`, return as a string with timestamps
-- [ ] Test: hardcode a URL, `console.log` the result
+- [x] Fetch transcript using `youtube-transcript`, return as a string with timestamps
+- [x] Test: hardcode a URL, `console.log` the result
 
 **Step 2 — Fetch video metadata**
-- [ ] Call YouTube oEmbed to get title, thumbnail, and channel:
+- [x] Call YouTube oEmbed to get title, thumbnail, and channel:
   ```ts
   const res = await fetch(
     `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
@@ -165,36 +165,34 @@ Build and test each step individually before connecting them.
   const data = await res.json()
   // data.title, data.thumbnail_url, data.author_name
   ```
-- [ ] Test: log the returned metadata
+- [x] Test: log the returned metadata
 
 **Step 3 — Chunk transcript**
-- [ ] Create `lib/chunkTranscript.ts`
-- [ ] Use `tiktoken` to count tokens accurately
-- [ ] Split into ~500 token chunks with 50 token overlap. To respect sentence boundaries, find the last full stop (`.`, `?`, `!`) before the 500 token limit and cut there — don't cut mid-sentence
-- [ ] Each chunk carries `start_time` and `end_time` from the transcript timestamps
-- [ ] Test: log chunk count and a few sample chunks
+- [x] Create `lib/chunkTranscript.ts`
+- [x] Use `tiktoken` to count tokens accurately
+- [x] Split into ~500 token chunks with 50 token overlap. To respect sentence boundaries, find the last full stop (`.`, `?`, `!`) before the 500 token limit and cut there — don't cut mid-sentence
+- [x] Each chunk carries `start_time` and `end_time` from the transcript timestamps
+- [x] Test: log chunk count and a few sample chunks
 
 **Step 4 — Embed chunks**
-- [ ] Create `lib/embed.ts`
-- [ ] Call HuggingFace Inference API with `nomic-embed-text`. The API returns an array of 768 numbers representing the meaning of the text:
+- [x] Create `lib/embed.ts`
+- [x] Call HuggingFace Inference API with `all-MiniLM-L6-v2` via `@huggingface/inference` SDK. The API returns an array of 384 numbers representing the meaning of the text:
   ```ts
-  const res = await fetch(
-    'https://api-inference.huggingface.co/models/nomic-ai/nomic-embed-text-v1',
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}` },
-      body: JSON.stringify({ inputs: text })
-    }
-  )
-  const embedding = await res.json() // number[] with length 768
+  import { InferenceClient } from '@huggingface/inference'
+  const client = new InferenceClient(process.env.HUGGINGFACE_API_KEY!)
+  const result = await client.featureExtraction({
+    model: 'sentence-transformers/all-MiniLM-L6-v2',
+    inputs: text,
+  })
+  const embedding = result as number[] // number[] with length 384
   ```
-- [ ] Test: embed a single sentence, log vector length (should be 768)
+- [x] Test: embed a single sentence, log vector length (should be 384)
 
 **Step 5 — Store in Supabase**
-- [ ] Create `lib/ingest.ts` — orchestrates steps 1–4
-- [ ] Insert video metadata into `videos` table
-- [ ] For each chunk: embed it, insert into `chunks` table
-- [ ] Test: run with a hardcoded URL, check rows appear in Supabase
+- [x] Create `lib/ingest.ts` — orchestrates steps 1–4
+- [x] Insert video metadata into `videos` table
+- [x] For each chunk: embed it, insert into `chunks` table
+- [x] Test: run with a hardcoded URL, check rows appear in Supabase
 
 **Done when:** rows appear in Supabase after running ingest with a real YouTube URL
 
