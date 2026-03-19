@@ -251,30 +251,29 @@ Build and test each step individually before connecting them.
 ## Phase 4 — API routes
 *Goal: expose the pipeline via HTTP endpoints*
 
-- [ ] Create `types/api.ts` — define TypeScript types for all request/response shapes. Example:
+- [x] Create `types/api.ts` — define TypeScript types for all request/response shapes. Example:
   ```ts
   export type IngestRequest = { url: string }
   export type IngestResponse = { videoId: string; title: string; chunkCount: number }
   export type QueryRequest = { question: string; videoId?: string }
   ```
-- [ ] Validate all incoming request bodies with `zod` before touching the pipeline:
+- [x] Validate all incoming request bodies with `zod` before touching the pipeline:
   ```ts
   import { z } from 'zod'
   const ingestSchema = z.object({ url: z.string().url() })
   const { url } = ingestSchema.parse(req.body)
   ```
-- [ ] Validate request body size in each route handler (App Router doesn't support the Pages Router `export const config` pattern — check `content-length` header or limit the parsed body size manually)
-- [ ] Add CORS headers to restrict requests to your own frontend only
-- [ ] `POST /api/ingest` — accepts `{ url }`, runs ingestion, returns video metadata
-- [ ] `POST /api/query` — accepts `{ question, video_id? }`, streams answer. If `video_id` is omitted, search across all videos using `match_chunks_all`
-- [ ] `GET /api/videos` — returns list of all ingested videos
-- [ ] `DELETE /api/videos/[id]` — deletes video and its chunks
-- [ ] Add rate limiting — use `rate-limiter-flexible` npm package to limit requests per IP. Note: in-memory rate limiting resets on every Vercel deployment and won't work across serverless instances — acceptable for now but not production-grade
+- [x] Validate request body size in each route handler (App Router doesn't support the Pages Router `export const config` pattern — check `content-length` header or limit the parsed body size manually)
+- [x] `POST /api/ingest` — accepts `{ url }`, runs ingestion, returns video metadata
+- [x] `POST /api/query` — accepts `{ question, video_id? }`, streams answer. If `video_id` is omitted, search across all videos using `match_chunks_all`
+- [x] `GET /api/videos` — returns list of all ingested videos
+- [x] `DELETE /api/videos/[id]` — deletes video and its chunks
+- [x] Add rate limiting — use `rate-limiter-flexible` npm package to limit requests per IP. Note: in-memory rate limiting resets on every Vercel deployment and won't work across serverless instances — acceptable for now but not production-grade
   ```bash
   npm install rate-limiter-flexible
   ```
-- [ ] Add error handling — invalid URL, video not found, API failures
-- [ ] Test all routes with Postman or Thunder Client (VS Code extension)
+- [x] Add error handling — invalid URL, video not found, API failures
+- [x] Test all routes with Postman or Thunder Client (VS Code extension)
 
 **Done when:** all routes return correct responses when called manually
 
@@ -353,11 +352,56 @@ The MCP server is a **separate Node.js process** from the Next.js app. They run 
   - `HUGGINGFACE_API_KEY`
   - `SUPABASE_URL`
   - `SUPABASE_ANON_KEY`
+- [ ] Add CORS headers to restrict API requests to your own frontend only
 - [ ] Verify all API routes work in production
 - [ ] Write README — what it is, how to run locally, MCP setup instructions
 - [ ] Record a short demo — ingest a video, ask questions, show MCP in Claude Desktop
 
 **Done when:** app is live and README is clear
+
+---
+
+---
+
+## Future — Video summarization
+*Goal: summarize an entire video or individual chapters*
+
+Current RAG retrieves only the top chunks for a specific question. These features add full-video and chapter-level summarization.
+
+### v2.1 — Full video summary
+- [ ] Create `POST /api/summarize` route
+- [ ] Fetch **all** chunks for the given video from Supabase, ordered by `chunk_index`
+- [ ] Concatenate chunks into the full transcript
+- [ ] If the transcript exceeds the LLM context window, split into sections and summarize each, then summarize the summaries (map-reduce)
+- [ ] Send to Groq with a summarization prompt, stream the response
+- [ ] Add MCP tool `summarizeVideo` wrapping the same logic
+- [ ] Add UI trigger in the frontend (e.g. "Summarize this video" button)
+
+**Done when:** user can get a full summary of any ingested video
+
+### v2.2 — Chapter-based summarization
+- [ ] Create `lib/getChapters.ts` — fetch chapter titles and timestamps from the YouTube video description (chapters are listed as `0:00 Title`, `3:45 Title`, etc.)
+- [ ] Fall back gracefully if the video has no chapters
+- [ ] Store chapters in a new `chapters` table:
+  ```sql
+  create table chapters (
+    id uuid primary key default gen_random_uuid(),
+    video_id uuid references videos(id) on delete cascade,
+    title text,
+    start_time int,
+    end_time int,
+    chapter_index int
+  );
+  ```
+- [ ] During ingestion, fetch and store chapters alongside transcript chunks
+- [ ] Create `POST /api/summarize/chapters` route:
+  - Group chunks by chapter using `start_time` / `end_time` ranges
+  - Summarize each chapter's chunks individually
+  - Return structured response: `{ chapters: [{ title, startTime, endTime, summary }] }`
+- [ ] Add MCP tool `summarizeByChapter`
+- [ ] Add UI: display chapter summaries as expandable sections with timestamp links
+
+**Done when:** user can see a per-chapter breakdown with summaries and timestamps
 
 ---
 
@@ -373,4 +417,6 @@ The MCP server is a **separate Node.js process** from the Next.js app. They run 
 | 5 | MCP server | 1 day |
 | 6 | Frontend | 1–2 days |
 | 7 | Deploy & polish | 0.5 days |
-| **Total** | | **~6–8 days** |
+| v2.1 | Full video summary | 0.5 days |
+| v2.2 | Chapter-based summarization | 1 day |
+| **Total** | | **~6–8 days + 1.5 days future** |
