@@ -284,7 +284,7 @@ Build and test each step individually before connecting them.
 
 The MCP server is a **separate Node.js process** from the Next.js app. They run in two different terminal windows — Next.js on one, MCP server on the other. The MCP server communicates with Claude Desktop over stdio (standard input/output), not HTTP. **It must only ever run locally — never expose it publicly.**
 
-- [ ] Create `mcp/server.ts` — register the server and its tools:
+- [x] Create `mcp/server.ts` — register the server and its tools:
   ```ts
   import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
   import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
@@ -296,16 +296,16 @@ The MCP server is a **separate Node.js process** from the Next.js app. They run 
   const transport = new StdioServerTransport()
   await server.connect(transport)
   ```
-- [ ] Create tools, each wrapping the relevant `lib/` module:
+- [x] Create tools, each wrapping the relevant `lib/` module:
   - `mcp/tools/ingestVideo.ts`
   - `mcp/tools/searchVideo.ts`
   - `mcp/tools/askVideo.ts`
   - `mcp/tools/listVideos.ts`
-- [ ] Add start script to `package.json`:
+- [x] Add start script to `package.json`:
   ```json
   "mcp": "tsx mcp/server.ts"
   ```
-- [ ] Add to Claude Desktop config file:
+- [x] Add to Claude Desktop config file:
   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
   ```json
@@ -319,7 +319,7 @@ The MCP server is a **separate Node.js process** from the Next.js app. They run 
     }
   }
   ```
-- [ ] Restart Claude Desktop, confirm the four tools appear in the tools list
+- [x] Restart Claude Desktop, confirm the four tools appear in the tools list
 
 **Done when:** Claude Desktop can ingest a video and answer questions using your MCP server
 
