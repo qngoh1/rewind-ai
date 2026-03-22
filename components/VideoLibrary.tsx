@@ -64,6 +64,31 @@ export function VideoLibrary({
           </div>
         ) : (
           <div className="space-y-0.5">
+            {/* All videos option */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => onSelect(null)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") onSelect(null)
+              }}
+              className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-l-3 ${
+                selectedVideoId === null
+                  ? "border-l-primary bg-white/60"
+                  : "border-l-transparent hover:bg-white/40"
+              }`}
+            >
+              <div className="w-10 h-10 rounded bg-muted flex items-center justify-center shrink-0">
+                <span className="text-xs font-medium text-muted-foreground">All</span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium leading-tight">All videos</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Search across your library
+                </p>
+              </div>
+            </div>
+
             {videos.map((video) => {
               const isSelected = selectedVideoId === video.id
               return (

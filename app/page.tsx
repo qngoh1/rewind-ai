@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from "react"
 import { IngestPanel } from "@/components/IngestPanel"
 import { VideoLibrary } from "@/components/VideoLibrary"
 import { ChatPanel } from "@/components/ChatPanel"
-import { RotateCcw } from "lucide-react"
+import { RotateCcw, X } from "lucide-react"
 import type { VideoItem } from "@/types/api"
 
 interface SavedMessage {
@@ -100,13 +100,25 @@ export default function Home() {
         </div>
 
         {/* Video title bar */}
-        {selectedVideo && (
-          <div className="px-6 py-3 border-b border-border">
-            <p className="text-sm text-muted-foreground truncate">
-              {selectedVideo.title}
+        <div className="px-6 py-3 border-b border-border flex items-center justify-between gap-3">
+          {selectedVideo ? (
+            <>
+              <p className="text-sm text-muted-foreground truncate">
+                {selectedVideo.title}
+              </p>
+              <button
+                onClick={() => setSelectedVideo(null)}
+                className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="size-4" />
+              </button>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              All videos
             </p>
-          </div>
-        )}
+          )}
+        </div>
 
         <ChatPanel
           key={selectedVideo?.id ?? "all"}
