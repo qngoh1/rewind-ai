@@ -353,9 +353,9 @@ The MCP server is a **separate Node.js process** from the Next.js app. They run 
   - `HUGGINGFACE_API_KEY`
   - `SUPABASE_URL`
   - `SUPABASE_ANON_KEY`
-- [ ] Add CORS headers to restrict API requests to your own frontend only
+- [x] Add CORS headers to restrict API requests to your own frontend only
 - [ ] Verify all API routes work in production
-- [ ] Write README — what it is, how to run locally, MCP setup instructions
+- [x] Write README — what it is, how to run locally, MCP setup instructions
 - [ ] Record a short demo — ingest a video, ask questions, show MCP in Claude Desktop
 
 **Done when:** app is live and README is clear

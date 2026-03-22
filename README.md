@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rewind
 
-## Getting Started
+Turn YouTube videos into a searchable, conversational knowledge base. Paste a URL, ask questions, and get streamed answers with timestamp citations.
 
-First, run the development server:
+Also ships as an MCP server — Claude Desktop can query your video library mid-conversation.
+
+## How it works
+
+1. **Paste a YouTube URL** — the transcript is fetched, chunked, embedded, and stored in Supabase
+2. **Ask a question** — your question is embedded, matched against stored chunks via vector search, and the top results are sent to an LLM
+3. **Get a cited answer** — the LLM streams an answer with clickable timestamp links back to the video
+
+## Tech stack
+
+- **Framework:** Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
+- **LLM:** Groq (Llama 3.3 70B)
+- **Embeddings:** HuggingFace (all-MiniLM-L6-v2, 384 dimensions)
+- **Vector DB:** Supabase pgvector
+- **Streaming:** Vercel AI SDK
+- **MCP:** @modelcontextprotocol/sdk (stdio transport)
+
+## Run locally
+
+### Prerequisites
+
+- Node.js 18+
+- API keys for [Groq](https://console.groq.com), [HuggingFace](https://huggingface.co), and [Supabase](https://supabase.com)
+
+### Setup
+
+```bash
+git clone https://github.com/your-username/rewind-ai.git
+cd rewind-ai
+npm install
+```
+
+Create a `.env` file:
+
+```
+GROQ_API_KEY=your_groq_key
+HUGGINGFACE_API_KEY=your_huggingface_key
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## MCP server (Claude Desktop)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The MCP server lets Claude Desktop ingest videos and answer questions using your Rewind library.
 
-## Learn More
+### Setup
 
-To learn more about Next.js, take a look at the following resources:
+Add this to your Claude Desktop config file:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```json
+{
+  "mcpServers": {
+    "rewind": {
+      "command": "npm",
+      "args": ["run", "mcp"],
+      "cwd": "/path/to/rewind-ai"
+    }
+  }
+}
+```
 
-## Deploy on Vercel
+Restart Claude Desktop. Four tools will appear:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **ingestVideo** — ingest a YouTube video by URL
+- **searchVideo** — search transcript chunks by query
+- **askVideo** — ask a question and get a generated answer
+- **listVideos** — list all ingested videos
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Example
+
+> "Ingest this video: https://youtube.com/watch?v=... then tell me what the speaker said about attention mechanisms"
+
+## Deploy to Vercel
+
+1. Push to GitHub
+2. Import the repo in [Vercel](https://vercel.com)
+3. Add the four environment variables (`GROQ_API_KEY`, `HUGGINGFACE_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`)
+4. Optionally set `NEXT_PUBLIC_APP_URL` to your production URL for CORS
+
+The MCP server runs locally only (stdio transport) and cannot be deployed.
+
+## License
+
+MIT
