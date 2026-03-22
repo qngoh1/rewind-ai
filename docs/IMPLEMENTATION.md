@@ -348,13 +348,13 @@ The MCP server is a **separate Node.js process** from the Next.js app. They run 
 ## Phase 7 — Deploy & polish
 *Goal: live and shareable*
 
-- [ ] Deploy to Vercel — connect GitHub repo, add all four environment variables in the Vercel dashboard:
+- [x] Deploy to Vercel — connect GitHub repo, add all four environment variables in the Vercel dashboard:
   - `GROQ_API_KEY`
   - `HUGGINGFACE_API_KEY`
   - `SUPABASE_URL`
   - `SUPABASE_ANON_KEY`
 - [x] Add CORS headers to restrict API requests to your own frontend only
-- [ ] Verify all API routes work in production
+- [x] Verify all API routes work in production
 - [x] Write README — what it is, how to run locally, MCP setup instructions
 - [ ] Record a short demo — ingest a video, ask questions, show MCP in Claude Desktop
 
@@ -404,6 +404,16 @@ Current RAG retrieves only the top chunks for a specific question. These feature
 
 **Done when:** user can see a per-chapter breakdown with summaries and timestamps
 
+### v2.3 — Per-user authentication
+- [ ] Enable Supabase Auth (Google OAuth or magic link — free tier)
+- [ ] Add `user_id` column to `videos` and `chunks` tables
+- [ ] Enable Row Level Security (RLS) on both tables so users can only access their own data
+- [ ] Add login/signup page and session management in the frontend
+- [ ] Update all API routes to extract user from session and filter queries by `user_id`
+- [ ] Update MCP server to accept a user token or default to a local user
+
+**Done when:** each user has their own private video library and can only query their own videos
+
 ---
 
 ## Summary
@@ -420,4 +430,5 @@ Current RAG retrieves only the top chunks for a specific question. These feature
 | 7 | Deploy & polish | 0.5 days |
 | v2.1 | Full video summary | 0.5 days |
 | v2.2 | Chapter-based summarization | 1 day |
-| **Total** | | **~6–8 days + 1.5 days future** |
+| v2.3 | Per-user authentication | 1 day |
+| **Total** | | **~6–8 days + 2.5 days future** |
