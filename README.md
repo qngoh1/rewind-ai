@@ -24,7 +24,7 @@ Also ships as an MCP server — Claude Desktop can query your video library mid-
 ### Prerequisites
 
 - Node.js 18+
-- API keys for [Groq](https://console.groq.com), [HuggingFace](https://huggingface.co), and [Supabase](https://supabase.com)
+- API keys for [Groq](https://console.groq.com), [HuggingFace](https://huggingface.co), [Supabase](https://supabase.com), and [Supadata](https://supadata.ai)
 
 ### Setup
 
@@ -41,6 +41,7 @@ GROQ_API_KEY=your_groq_key
 HUGGINGFACE_API_KEY=your_huggingface_key
 SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPADATA_API_KEY=your_supadata_key
 ```
 
 Start the dev server:
@@ -89,7 +90,7 @@ Restart Claude Desktop. Four tools will appear:
 
 1. Push to GitHub
 2. Import the repo in [Vercel](https://vercel.com)
-3. Add the four environment variables (`GROQ_API_KEY`, `HUGGINGFACE_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`)
+3. Add the environment variables (`GROQ_API_KEY`, `HUGGINGFACE_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPADATA_API_KEY`)
 4. Optionally set `NEXT_PUBLIC_APP_URL` to your production URL for CORS
 
 The MCP server runs locally only (stdio transport) and cannot be deployed.

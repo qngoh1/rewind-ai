@@ -1,5 +1,3 @@
-import { YoutubeTranscript, type TranscriptResponse } from 'youtube-transcript'
-
 export interface TranscriptSegment {
   text: string
   offset: number   // start time in seconds
@@ -21,9 +19,24 @@ export function extractVideoId(youtubeUrl: string): string {
 }
 
 export async function getTranscript(videoId: string): Promise<TranscriptSegment[]> {
-  const raw: TranscriptResponse[] = await YoutubeTranscript.fetchTranscript(videoId)
+  const url = `https://api.supadata.ai/v1/youtube/transcript?url=https://www.youtube.com/watch?v=${videoId}&lang=en`
+  const res = await fetch(url, {
+    headers: { 'x-api-key': process.env.SUPADATA_API_KEY! },
+  })
 
-  return raw.map((segment) => ({
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(`Transcript fetch failed: ${body.message || res.statusText}`)
+  }
+
+  const data = await res.json()
+  const segments = data.content as { text: string; offset: number; duration: number }[]
+
+  if (!segments || segments.length === 0) {
+    throw new Error('No transcript available for this video')
+  }
+
+  return segments.map((segment) => ({
     text: segment.text,
     offset: segment.offset / 1000,     // ms → seconds
     duration: segment.duration / 1000,  // ms → seconds
