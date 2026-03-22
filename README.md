@@ -93,7 +93,3 @@ Restart Claude Desktop. Four tools will appear:
 4. Optionally set `NEXT_PUBLIC_APP_URL` to your production URL for CORS
 
 The MCP server runs locally only (stdio transport) and cannot be deployed.
-
-## License
-
-MIT
