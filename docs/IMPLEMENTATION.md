@@ -39,6 +39,7 @@ Build backend first, then API, then frontend. Never build UI before the underlyi
   SUPABASE_ANON_KEY=
   ```
 - [x] Sign up and get API keys: Groq (console.groq.com), HuggingFace (huggingface.co), Supabase (supabase.com)
+  - HuggingFace: create a fine-grained token with only the **"Make calls to Inference Providers"** permission — no other permissions needed
 - [x] Install `zod` for request validation: `npm install zod`
 - [x] Never prefix env vars with `NEXT_PUBLIC_` — all API calls to Groq and HuggingFace must happen server-side only (API routes), never in React components
 
@@ -328,17 +329,17 @@ The MCP server is a **separate Node.js process** from the Next.js app. They run 
 ## Phase 6 — Frontend
 *Goal: a clean, usable web interface*
 
-- [ ] `app/page.tsx` — root layout composing sidebar and chat panel side by side
-- [ ] `components/IngestPanel.tsx` — URL input + submit button + loading state
-- [ ] `components/VideoLibrary.tsx` — sidebar listing ingested videos, click to select
-- [ ] `components/ChatPanel.tsx` — question input + streamed answer. Use the Vercel AI SDK `useChat` hook to handle streaming automatically:
+- [x] `app/page.tsx` — root layout composing sidebar and chat panel side by side
+- [x] `components/IngestPanel.tsx` — URL input + submit button + loading state
+- [x] `components/VideoLibrary.tsx` — sidebar listing ingested videos, click to select
+- [x] `components/ChatPanel.tsx` — question input + streamed answer. Use the Vercel AI SDK `useChat` hook to handle streaming automatically:
   ```ts
-  import { useChat } from 'ai/react'
-  const { messages, input, handleSubmit } = useChat({ api: '/api/query' })
+  import { useChat } from '@ai-sdk/react'
+  const { messages, sendMessage, status } = useChat({ transport })
   ```
-- [ ] `components/SourceChips.tsx` — clickable timestamp chips that link to the moment in the YouTube video
-- [ ] Wire to API routes — ingest on submit, query on send, load library on page load
-- [ ] Add error states and make layout responsive
+- [x] `components/SourceChips.tsx` — clickable timestamp chips that link to the moment in the YouTube video
+- [x] Wire to API routes — ingest on submit, query on send, load library on page load
+- [x] Add error states and make layout responsive
 
 **Done when:** full user journey works in the browser — paste URL → ingest → ask question → see streamed answer with timestamps
 

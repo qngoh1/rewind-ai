@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result)
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid request', details: err.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid request', details: err.issues }, { status: 400 })
     }
     const message = err instanceof Error ? err.message : 'Ingestion failed'
     return NextResponse.json({ error: message }, { status: 500 })
