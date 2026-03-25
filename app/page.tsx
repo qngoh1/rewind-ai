@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { IngestPanel } from "@/components/IngestPanel"
 import { VideoLibrary } from "@/components/VideoLibrary"
 import { ChatPanel } from "@/components/ChatPanel"
-import { RotateCcw, X } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { RotateCcw, X, LogOut } from "lucide-react"
 import type { VideoItem } from "@/types/api"
 
 interface SavedMessage {
@@ -17,12 +18,26 @@ export default function Home() {
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const [sidebarWidth, setSidebarWidth] = useState(320)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
   const isResizing = useRef(false)
   const chatHistory = useRef<Map<string, SavedMessage[]>>(new Map())
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserEmail(user?.email ?? null)
+    })
+  }, [])
 
   const handleIngested = useCallback(() => {
     setRefreshKey((k) => k + 1)
   }, [])
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    window.location.href = "/login"
+  }
 
   function handleMouseDown(e: React.MouseEvent) {
     e.preventDefault()
@@ -79,6 +94,20 @@ export default function Home() {
           onSelect={setSelectedVideo}
           refreshKey={refreshKey}
         />
+        {/* User & logout */}
+        <div className="mt-auto border-t border-border px-4 py-3 flex items-center justify-between gap-2">
+          <span className="text-xs text-muted-foreground truncate">
+            {userEmail}
+          </span>
+          <button
+            onClick={handleSignOut}
+            className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+            title="Sign out"
+          >
+            <LogOut className="size-4" />
+          </button>
+        </div>
+
         {/* Resize handle */}
         <div
           onMouseDown={handleMouseDown}

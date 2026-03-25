@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { embed } from './embed'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export interface ChunkResult {
   id: string
@@ -22,8 +23,10 @@ async function embedWithCache(query: string): Promise<number[]> {
 
 export async function search(
   query: string,
+  userId: string,
   videoId?: string,
-  matchCount = 5
+  matchCount = 5,
+  client: SupabaseClient = supabase
 ): Promise<ChunkResult[]> {
   const queryEmbedding = await embedWithCache(query)
 
@@ -31,12 +34,13 @@ export async function search(
   const params: Record<string, unknown> = {
     query_embedding: queryEmbedding,
     match_count: matchCount,
+    match_user_id: userId,
   }
   if (videoId) {
     params.match_video_id = videoId
   }
 
-  const { data, error } = await supabase.rpc(rpcName, params)
+  const { data, error } = await client.rpc(rpcName, params)
 
   if (error) throw new Error(`Search failed: ${error.message}`)
   return data as ChunkResult[]

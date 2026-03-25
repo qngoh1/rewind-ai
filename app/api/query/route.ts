@@ -3,10 +3,20 @@ import { search } from '@/lib/search'
 import { buildPrompt } from '@/lib/buildPrompt'
 import { generate } from '@/lib/generate'
 import { rateLimit } from '@/lib/rateLimit'
+import { getAuthUser } from '@/lib/auth'
+import { getAdminClient } from '@/lib/supabase-admin'
 
 const MAX_BODY_SIZE = 16384
 
 export async function POST(req: NextRequest) {
+  const user = await getAuthUser()
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const rateLimited = await rateLimit(req)
   if (rateLimited) return rateLimited
 
@@ -57,7 +67,7 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('[query] question:', question, 'videoId:', videoId)
-    const chunks = await search(question, videoId, 15)
+    const chunks = await search(question, user.id, videoId, 15, getAdminClient())
     console.log('[query] chunks found:', chunks.length)
     const systemPrompt = buildPrompt(chunks)
     console.log('[query] prompt length:', systemPrompt.length)
