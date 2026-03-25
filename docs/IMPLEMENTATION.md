@@ -369,7 +369,7 @@ The MCP server is a **separate Node.js process** from the Next.js app. They run 
 
 Current app has no authentication and RAG retrieves only the top chunks for a specific question. These features add user isolation and broader summarization capabilities.
 
-### v2.1 — Per-user authentication
+### Per-user authentication
 - [ ] Enable Supabase Auth (Google OAuth or magic link — free tier)
 - [ ] Add `user_id` column to `videos` and `chunks` tables
 - [ ] Enable Row Level Security (RLS) on both tables so users can only access their own data
@@ -379,7 +379,7 @@ Current app has no authentication and RAG retrieves only the top chunks for a sp
 
 **Done when:** each user has their own private video library and can only query their own videos
 
-### v2.2 — Full video summary
+### Full video summary
 - [ ] Create `POST /api/summarize` route
 - [ ] Fetch **all** chunks for the given video from Supabase, ordered by `chunk_index`
 - [ ] Concatenate chunks into the full transcript
@@ -390,7 +390,7 @@ Current app has no authentication and RAG retrieves only the top chunks for a sp
 
 **Done when:** user can get a full summary of any ingested video
 
-### v2.3 — Chapter-based summarization
+### Chapter-based summarization
 - [ ] Create `lib/getChapters.ts` — fetch chapter titles and timestamps from the YouTube video description (chapters are listed as `0:00 Title`, `3:45 Title`, etc.)
 - [ ] Fall back gracefully if the video has no chapters
 - [ ] Store chapters in a new `chapters` table:
@@ -428,7 +428,4 @@ Current app has no authentication and RAG retrieves only the top chunks for a sp
 | 5 | MCP server | 1 day |
 | 6 | Frontend | 1–2 days |
 | 7 | Deploy & polish | 0.5 days |
-| v2.1 | Per-user authentication | 1 day |
-| v2.2 | Full video summary | 0.5 days |
-| v2.3 | Chapter-based summarization | 1 day |
-| **Total** | | **~6–8 days + 2.5 days future** |
+| **Total** | | **~6–8 days** |
