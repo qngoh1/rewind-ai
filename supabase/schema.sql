@@ -4,12 +4,14 @@ create extension if not exists vector;
 -- Videos table
 create table videos (
   id uuid primary key default gen_random_uuid(),
-  youtube_id text unique not null,
+  youtube_id text not null,
   title text,
   thumbnail text,
   duration int,
   channel text,
-  created_at timestamp default now()
+  user_id uuid not null references auth.users(id),
+  created_at timestamp default now(),
+  constraint videos_user_youtube_unique unique (user_id, youtube_id)
 );
 
 -- Chunks table
@@ -21,6 +23,7 @@ create table chunks (
   start_time int,
   end_time int,
   chunk_index int,
+  user_id uuid not null references auth.users(id),
   created_at timestamp default now()
 );
 
@@ -31,6 +34,7 @@ create index on chunks using hnsw (embedding vector_cosine_ops);
 create or replace function match_chunks(
   query_embedding vector(384),
   match_video_id uuid,
+  match_user_id uuid,
   match_count int default 5
 )
 returns table(id uuid, video_id uuid, content text, start_time int, end_time int, similarity float)
@@ -39,6 +43,7 @@ language sql as $$
     1 - (embedding <=> query_embedding) as similarity
   from chunks
   where video_id = match_video_id
+    and user_id = match_user_id
   order by embedding <=> query_embedding
   limit match_count;
 $$;
@@ -46,6 +51,7 @@ $$;
 -- Similarity search across all videos
 create or replace function match_chunks_all(
   query_embedding vector(384),
+  match_user_id uuid,
   match_count int default 5
 )
 returns table(id uuid, video_id uuid, content text, start_time int, end_time int, similarity float)
@@ -53,6 +59,7 @@ language sql as $$
   select id, video_id, content, start_time, end_time,
     1 - (embedding <=> query_embedding) as similarity
   from chunks
+  where user_id = match_user_id
   order by embedding <=> query_embedding
   limit match_count;
 $$;
@@ -61,16 +68,24 @@ $$;
 alter table videos enable row level security;
 alter table chunks enable row level security;
 
--- Grant table permissions to anon role
-grant select, insert, update, delete on videos to anon;
-grant select, insert, update, delete on chunks to anon;
+-- Grant table permissions to authenticated role
+grant select, insert, update, delete on videos to authenticated;
+grant select, insert, update, delete on chunks to authenticated;
 
--- Allow all operations (no auth)
-create policy "anon_select_videos" on videos for select to anon using (true);
-create policy "anon_insert_videos" on videos for insert to anon with check (true);
-create policy "anon_update_videos" on videos for update to anon using (true) with check (true);
-create policy "anon_delete_videos" on videos for delete to anon using (true);
-create policy "anon_select_chunks" on chunks for select to anon using (true);
-create policy "anon_insert_chunks" on chunks for insert to anon with check (true);
-create policy "anon_update_chunks" on chunks for update to anon using (true) with check (true);
-create policy "anon_delete_chunks" on chunks for delete to anon using (true);
+-- RLS policies for authenticated users (scoped to own data)
+create policy "auth_select_videos" on videos for select to authenticated using (auth.uid() = user_id);
+create policy "auth_insert_videos" on videos for insert to authenticated with check (auth.uid() = user_id);
+create policy "auth_update_videos" on videos for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "auth_delete_videos" on videos for delete to authenticated using (auth.uid() = user_id);
+create policy "auth_select_chunks" on chunks for select to authenticated using (auth.uid() = user_id);
+create policy "auth_insert_chunks" on chunks for insert to authenticated with check (auth.uid() = user_id);
+create policy "auth_update_chunks" on chunks for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "auth_delete_chunks" on chunks for delete to authenticated using (auth.uid() = user_id);
+
+-- Service role policies (for MCP server)
+create policy "service_select_videos" on videos for select to service_role using (true);
+create policy "service_select_chunks" on chunks for select to service_role using (true);
+create policy "service_insert_videos" on videos for insert to service_role with check (true);
+create policy "service_insert_chunks" on chunks for insert to service_role with check (true);
+create policy "service_delete_videos" on videos for delete to service_role using (true);
+create policy "service_delete_chunks" on chunks for delete to service_role using (true);

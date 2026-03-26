@@ -1,23 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { updateSession } from '@/lib/supabase/middleware'
 
 const ALLOWED_ORIGINS = [
   process.env.NEXT_PUBLIC_APP_URL,
   'http://localhost:3000',
 ].filter(Boolean)
 
-export function middleware(req: NextRequest) {
-  const origin = req.headers.get('origin')
+export async function middleware(req: NextRequest) {
+  // Handle CORS for API routes
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    const origin = req.headers.get('origin')
 
-  // Handle preflight (OPTIONS) requests
-  if (req.method === 'OPTIONS') {
-    const res = new NextResponse(null, { status: 204 })
+    if (req.method === 'OPTIONS') {
+      const res = new NextResponse(null, { status: 204 })
+      setCorsHeaders(res, origin)
+      return res
+    }
+
+    const res = NextResponse.next()
     setCorsHeaders(res, origin)
+    // API routes handle auth themselves via getAuthUser()
     return res
   }
 
-  const res = NextResponse.next()
-  setCorsHeaders(res, origin)
-  return res
+  // For all other routes, refresh session and redirect if unauthenticated
+  return updateSession(req)
 }
 
 function setCorsHeaders(res: NextResponse, origin: string | null) {
@@ -30,5 +37,7 @@ function setCorsHeaders(res: NextResponse, origin: string | null) {
 }
 
 export const config = {
-  matcher: '/api/:path*',
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }

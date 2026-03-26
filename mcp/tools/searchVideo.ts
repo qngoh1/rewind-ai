@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import { search } from '../../lib/search'
+import { getAdminClient } from '../../lib/supabase-admin'
 
 function formatTime(seconds: number): string {
   const h = Math.floor(seconds / 3600)
@@ -19,7 +20,15 @@ export function registerSearchVideo(server: McpServer) {
       videoId: z.string().uuid().optional().describe('Video ID to search within. Omit to search all videos.'),
     },
     async ({ query, videoId }) => {
-      const chunks = await search(query, videoId)
+      const userId = process.env.REWIND_USER_ID
+      if (!userId) {
+        return {
+          content: [{ type: 'text' as const, text: 'Error: REWIND_USER_ID env var is not set' }],
+          isError: true,
+        }
+      }
+
+      const chunks = await search(query, userId, videoId, 5, getAdminClient())
 
       if (chunks.length === 0) {
         return {

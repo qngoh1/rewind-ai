@@ -370,12 +370,12 @@ The MCP server is a **separate Node.js process** from the Next.js app. They run 
 Current app has no authentication and RAG retrieves only the top chunks for a specific question. These features add user isolation and broader summarization capabilities.
 
 ### Per-user authentication
-- [ ] Enable Supabase Auth (Google OAuth or magic link — free tier)
-- [ ] Add `user_id` column to `videos` and `chunks` tables
-- [ ] Enable Row Level Security (RLS) on both tables so users can only access their own data
-- [ ] Add login/signup page and session management in the frontend
-- [ ] Update all API routes to extract user from session and filter queries by `user_id`
-- [ ] Update MCP server to accept a user token or default to a local user
+- [x] Enable Supabase Auth (Google OAuth or magic link — free tier)
+- [x] Add `user_id` column to `videos` and `chunks` tables
+- [x] Enable Row Level Security (RLS) on both tables so users can only access their own data
+- [x] Add login/signup page and session management in the frontend
+- [x] Update all API routes to extract user from session and filter queries by `user_id`
+- [x] Update MCP server to accept a user token or default to a local user
 
 **Done when:** each user has their own private video library and can only query their own videos
 

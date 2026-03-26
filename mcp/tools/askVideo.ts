@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { search } from '../../lib/search'
 import { buildPrompt } from '../../lib/buildPrompt'
 import { generate } from '../../lib/generate'
+import { getAdminClient } from '../../lib/supabase-admin'
 
 export function registerAskVideo(server: McpServer) {
   server.tool(
@@ -13,7 +14,15 @@ export function registerAskVideo(server: McpServer) {
       videoId: z.string().uuid().optional().describe('Video ID to ask about. Omit to search all videos.'),
     },
     async ({ question, videoId }) => {
-      const chunks = await search(question, videoId)
+      const userId = process.env.REWIND_USER_ID
+      if (!userId) {
+        return {
+          content: [{ type: 'text' as const, text: 'Error: REWIND_USER_ID env var is not set' }],
+          isError: true,
+        }
+      }
+
+      const chunks = await search(question, userId, videoId, 5, getAdminClient())
       const systemPrompt = buildPrompt(chunks)
       const result = await generate(systemPrompt, question)
 

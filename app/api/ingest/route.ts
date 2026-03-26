@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { ingest } from '@/lib/ingest'
 import { rateLimit } from '@/lib/rateLimit'
+import { getAuthUser } from '@/lib/auth'
+import { getAdminClient } from '@/lib/supabase-admin'
 
 const MAX_BODY_SIZE = 1024 // 1KB — only a URL
 
@@ -10,6 +12,11 @@ const ingestSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  const user = await getAuthUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const rateLimited = await rateLimit(req)
   if (rateLimited) return rateLimited
 
@@ -21,7 +28,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { url } = ingestSchema.parse(body)
-    const result = await ingest(url)
+    const result = await ingest(url, user.id, getAdminClient())
     return NextResponse.json(result)
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
