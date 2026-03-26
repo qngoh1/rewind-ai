@@ -119,10 +119,10 @@ All 4 routes get auth check at the top:
 ## Verification
 
 1. Run `npm run dev`, confirm redirect to `/login`
-2. Enter email, receive magic link, click it — confirm redirect to `/`
+2. Click Google or GitHub OAuth button, complete sign-in — confirm redirect to `/`
 3. Ingest a video — confirm `user_id` is set in Supabase `videos` and `chunks` tables
 4. Query the video — confirm results scoped to user
-5. Open incognito, sign up as a different user — confirm they see an empty library
+5. Open incognito, sign in as a different user — confirm they see an empty library
 6. Ingest the same YouTube URL as user 2 — confirm it works (no unique constraint violation)
 7. Confirm user 1 still only sees their own videos
 8. Test delete — confirm user can only delete their own videos

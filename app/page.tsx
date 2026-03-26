@@ -62,7 +62,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full overflow-hidden">
       {/* Sidebar */}
       <aside
         style={{ width: sidebarWidth }}
@@ -116,7 +116,7 @@ export default function Home() {
       </aside>
 
       {/* Main chat area */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile header */}
         <div className="md:hidden p-4 border-b border-border space-y-3">
           <div className="flex items-center gap-2.5">
