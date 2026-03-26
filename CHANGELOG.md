@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0
+
+- Add per-user authentication with Supabase Auth (Google and GitHub OAuth)
+- Fix sidebar scroll so it stays fixed while chat scrolls independently
+- Exclude scripts/ from TypeScript build to fix Vercel deployment
+
 ## v1.0.0
 
 - Initialize project with Next.js 15, TypeScript, Tailwind CSS, and shadcn/ui
