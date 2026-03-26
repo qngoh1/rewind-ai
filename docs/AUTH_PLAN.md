@@ -2,11 +2,11 @@
 
 ## Context
 
-The app currently has no authentication — all videos and chunks are globally shared, RLS policies allow all operations, and any user can see/delete anyone's data. This change adds per-user isolation using Supabase Auth with magic link (email) login.
+The app currently has no authentication — all videos and chunks are globally shared, RLS policies allow all operations, and any user can see/delete anyone's data. This change adds per-user isolation using Supabase Auth with Google and GitHub OAuth.
 
 ## Key Design Decisions
 
-1. **Auth method:** Magic link email (free tier, no OAuth config needed)
+1. **Auth method:** Google and GitHub OAuth via Supabase Auth (free tier)
 2. **Package:** `@supabase/ssr` for Next.js App Router cookie-based sessions
 3. **youtube_id constraint:** Change from globally unique to `unique(user_id, youtube_id)` so different users can ingest the same video
 4. **user_id on chunks:** Add directly (not via join) — simpler RLS and needed for `match_chunks` RPC which bypasses RLS
@@ -58,7 +58,7 @@ Modify `middleware.ts`:
 
 ### Step 6 — Login page & auth callback
 
-- **`app/login/page.tsx`** — email input + "Send magic link" button using `supabase.auth.signInWithOtp()`
+- **`app/login/page.tsx`** — OAuth buttons for Google and GitHub using `supabase.auth.signInWithOAuth()`
 - **`app/auth/callback/route.ts`** — exchanges auth code for session, redirects to `/`
 
 ### Step 7 — Update API routes
@@ -115,6 +115,38 @@ All 4 routes get auth check at the top:
 | `app/page.tsx` | Add logout button |
 | `lib/supabase-admin.ts` | **New** — service role client for MCP |
 | `mcp/tools/*.ts` | Add userId from env, use admin client |
+
+## External service configuration
+
+### Supabase Dashboard (Authentication > URL Configuration)
+- **Site URL:** `https://rewind-ai-six.vercel.app`
+- **Redirect URLs:**
+  - `http://localhost:3000/auth/callback` (local dev)
+  - `https://rewind-ai-six.vercel.app/auth/callback` (production)
+
+### Supabase Dashboard (Authentication > Providers)
+- **Google:** enabled — requires Client ID and Client Secret from Google Cloud Console
+- **GitHub:** enabled — requires Client ID and Client Secret from GitHub OAuth App
+
+### Google Cloud Console (APIs & Services > Credentials > OAuth 2.0 Client)
+- **Authorized redirect URI:** `https://pkvomfbbabuqifvqikev.supabase.co/auth/v1/callback`
+
+### GitHub (Settings > Developer settings > OAuth Apps)
+- **Authorization callback URL:** `https://pkvomfbbabuqifvqikev.supabase.co/auth/v1/callback`
+
+### Vercel (Project Settings > Environment Variables)
+- `GROQ_API_KEY`
+- `HUGGINGFACE_API_KEY`
+- `SUPADATA_API_KEY`
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### Local `.env` (additional vars for MCP server)
+- `REWIND_USER_ID` — your Supabase Auth user UUID (find in Supabase Dashboard > Authentication > Users)
+- `SUPABASE_SERVICE_ROLE_KEY` — find in Supabase Dashboard > Settings > API
 
 ## Verification
 
