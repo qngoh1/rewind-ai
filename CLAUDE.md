@@ -38,6 +38,8 @@ SUPABASE_ANON_KEY=
 ## Key Constraints
 
 - **Embedding model is fixed.** Switching models invalidates all stored vectors and requires full re-ingestion.
-- **No auth.** Out of scope — no accounts, no private videos, no non-English transcripts.
+- **Auth via Supabase.** Google & GitHub OAuth. All pages and API routes require authentication. Data is isolated per user.
+- **Daily ingestion cap.** 10 videos per user per day to protect free-tier API limits. Enforced in `/api/ingest` and shown in the UI.
+- **Rate limiting.** 10 requests per 60 seconds per IP (in-memory).
 - **Free tier only.** Groq, Supabase, and Vercel free tiers throughout.
 - **Chunking uses overlap.** 50-token overlap at sentence boundaries prevents missing answers that span chunk edges.

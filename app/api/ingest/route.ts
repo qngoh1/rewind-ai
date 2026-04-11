@@ -6,6 +6,7 @@ import { getAuthUser } from '@/lib/auth'
 import { getAdminClient } from '@/lib/supabase-admin'
 
 const MAX_BODY_SIZE = 1024 // 1KB — only a URL
+const DAILY_INGEST_LIMIT = 10
 
 const ingestSchema = z.object({
   url: z.url(),
@@ -23,6 +24,27 @@ export async function POST(req: NextRequest) {
   const contentLength = parseInt(req.headers.get('content-length') ?? '0')
   if (contentLength > MAX_BODY_SIZE) {
     return NextResponse.json({ error: 'Request body too large' }, { status: 413 })
+  }
+
+  // Check daily ingestion limit
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+
+  const { count, error: countError } = await getAdminClient()
+    .from('videos')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .gte('created_at', todayStart.toISOString())
+
+  if (countError) {
+    return NextResponse.json({ error: countError.message }, { status: 500 })
+  }
+
+  if ((count ?? 0) >= DAILY_INGEST_LIMIT) {
+    return NextResponse.json(
+      { error: `Daily limit reached. You can add up to ${DAILY_INGEST_LIMIT} videos per day.` },
+      { status: 429 }
+    )
   }
 
   try {
