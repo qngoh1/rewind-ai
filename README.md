@@ -7,17 +7,17 @@ Also ships as an MCP server — Claude Desktop can query your video library mid-
 ## Demo
 
 ### Ingest a YouTube video
-<video src="./docs/demo-ingest.mp4" autoplay loop muted playsinline></video>
+https://github.com/user-attachments/assets/d97d0f67-db59-44e8-a42c-7703c8d4e3d3
 
 > Paste any YouTube URL and hit Add. The transcript is automatically chunked, embedded, and stored — ready to query in seconds.
 
 ### Ask questions with AI
-<video src="./docs/demo-query.mp4" autoplay loop muted playsinline></video>
+https://github.com/user-attachments/assets/ba3ca5ad-8dc7-41d9-a9e4-2a5c94d07d0c
 
 > Select a video and ask anything. Answers are streamed in real-time with clickable timestamp citations that jump to the exact moment.
 
 ### Claude Desktop via MCP
-<video src="./docs/demo-mcp.mp4" autoplay loop muted playsinline></video>
+https://github.com/user-attachments/assets/2d29bb02-8129-4a17-9525-0654537db127
 
 > Use Rewind as an MCP tool inside Claude Desktop — ingest videos and ask questions without leaving the conversation.
 
