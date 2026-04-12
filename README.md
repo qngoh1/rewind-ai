@@ -4,6 +4,23 @@ Turn YouTube videos into a searchable, conversational knowledge base. Paste a UR
 
 Also ships as an MCP server — Claude Desktop can query your video library mid-conversation.
 
+## Demo
+
+### Ingest a YouTube video
+<video src="./docs/demo-ingest.mp4" autoplay loop muted playsinline></video>
+
+> Paste any YouTube URL and hit Add. The transcript is automatically chunked, embedded, and stored — ready to query in seconds.
+
+### Ask questions with AI
+<video src="./docs/demo-query.mp4" autoplay loop muted playsinline></video>
+
+> Select a video and ask anything. Answers are streamed in real-time with clickable timestamp citations that jump to the exact moment.
+
+### Claude Desktop via MCP
+<video src="./docs/demo-mcp.mp4" autoplay loop muted playsinline></video>
+
+> Use Rewind as an MCP tool inside Claude Desktop — ingest videos and ask questions without leaving the conversation.
+
 ## How it works
 
 1. **Paste a YouTube URL** — the transcript is fetched, chunked, embedded, and stored in Supabase
